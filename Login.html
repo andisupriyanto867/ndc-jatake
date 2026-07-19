@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+  }
+
+  .login-card {
+    background: #fff;
+    width: 100%;
+    max-width: 360px;
+    border-radius: 16px;
+    padding: 36px 30px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+    animation: fadeIn .4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-card h1 {
+    font-size: 22px;
+    color: #1e3c72;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .login-card p.subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1.5px solid #dfe3ea;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color .2s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #2a5298;
+  }
+
+  .pw-wrap {
+    position: relative;
+  }
+
+  .pw-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 12px;
+    color: #2a5298;
+    user-select: none;
+  }
+
+  button.submit-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #2a5298;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    margin-top: 6px;
+  }
+
+  button.submit-btn:hover { background: #1e3c72; }
+  button.submit-btn:active { transform: scale(0.98); }
+  button.submit-btn:disabled {
+    background: #a9b4c7;
+    cursor: not-allowed;
+  }
+
+  .msg {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 14px;
+    min-height: 18px;
+  }
+  .msg.error { color: #d93025; }
+  .msg.success { color: #188038; }
+
+  /* Halaman menu setelah login sukses */
+  .menu-card {
+    display: none;
+    text-align: center;
+  }
+  .menu-card .check {
+    font-size: 40px;
+    color: #188038;
+    margin-bottom: 8px;
+  }
+  .menu-card h2 {
+    color: #1e3c72;
+    margin-bottom: 4px;
+    font-size: 19px;
+  }
+  .menu-card p {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 26px;
+  }
+
+  .menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px 18px;
+    border: 1.5px solid #dfe3ea;
+    border-radius: 12px;
+    background: #f7f9fc;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .2s, background .2s, transform .1s;
+  }
+
+  .menu-btn:hover {
+    border-color: #2a5298;
+    background: #eef3fb;
+  }
+  .menu-btn:active { transform: scale(0.98); }
+
+  .menu-btn .icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #2a5298;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .menu-btn .label {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-btn .label strong {
+    font-size: 14px;
+    color: #1e3c72;
+  }
+
+  .menu-btn .label span {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .logout-btn {
+    background: #eee;
+    color: #333;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="login-card" id="loginCard">
+    <h1>NDC Jatake</h1>
+    <p class="subtitle">Silakan login untuk melanjutkan</p>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label for="username">Akun</label>
+        <input type="text" id="username" autocomplete="username" required>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="password" autocomplete="current-password" required>
+          <span class="pw-toggle" onclick="togglePw()">Lihat</span>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Login</button>
+      <div class="msg" id="msg"></div>
+    </form>
+  </div>
+
+  <div class="login-card menu-card" id="menuCard">
+    <div class="check">✔</div>
+    <h2 id="welcomeName">Selamat datang</h2>
+    <p>Pilih lokasi NDC Jatake</p>
+
+    <div class="menu-options">
+      <div class="menu-btn" onclick="openBuilding('J3')">
+        <div class="icon">J3</div>
+        <div class="label">
+          <strong>NDC Jatake 3</strong>
+          <span>Buka menu Jatake 3</span>
+        </div>
+      </div>
+
+      <div class="menu-btn" onclick="openBuilding('J6')">
+        <div class="icon">J6</div>
+        <div class="label">
+          <strong>NDC Jatake 6</strong>
+          <span>Buka menu Jatake 6</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+<script>
+  // Cek apakah sudah pernah login (tersimpan sementara di browser)
+  window.onload = function () {
+    var savedUser = sessionStorage.getItem('loggedInUser');
+    if (savedUser) showMenu(savedUser);
+  };
+
+  function togglePw() {
+    var pw = document.getElementById('password');
+    var toggle = document.querySelector('.pw-toggle');
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      toggle.textContent = 'Sembunyikan';
+    } else {
+      pw.type = 'password';
+      toggle.textContent = 'Lihat';
+    }
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+
+    if (typeof google === 'undefined' || !google.script || !google.script.run) {
+      var msg0 = document.getElementById('msg');
+      msg0.className = 'msg error';
+      msg0.textContent = 'Halaman ini harus dibuka lewat link Apps Script (/exec), bukan dibuka langsung sebagai file HTML.';
+      return;
+    }
+
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    var btn = document.getElementById('submitBtn');
+    var msg = document.getElementById('msg');
+
+    btn.disabled = true;
+    btn.textContent = 'Memeriksa...';
+    msg.textContent = '';
+    msg.className = 'msg';
+
+    google.script.run
+      .withSuccessHandler(function (res) {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+
+        if (res.success) {
+          msg.className = 'msg success';
+          msg.textContent = res.message;
+          sessionStorage.setItem('loggedInUser', res.username);
+          setTimeout(function () { showMenu(res.username); }, 400);
+        } else {
+          msg.className = 'msg error';
+          msg.textContent = res.message;
+        }
+      })
+      .withFailureHandler(function (err) {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+        msg.className = 'msg error';
+        msg.textContent = 'Gagal menghubungi server: ' + (err && err.message ? err.message : err);
+        console.error('Login error:', err);
+      })
+      .checkLogin(username, password);
+  }
+
+  function showMenu(username) {
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('menuCard').style.display = 'block';
+    document.getElementById('welcomeName').textContent = 'Selamat datang, ' + username;
+  }
+
+  function openBuilding(kode) {
+    // Link Apps Script untuk masing-masing gedung
+    var urls = {
+      'J3': 'https://script.google.com/macros/s/AKfycbxUG7ckNJkdxmKXufVKBdKaR9VnIdr4_8Q4wkugzbUHCbxcsU1dFQOEDwA7Qc14NUQ/exec',
+      'J6': 'https://script.google.com/macros/s/AKfycbxUG7ckNJkdxmKXufVKBdKaR9VnIdr4_8Q4wkugzbUHCbxcsU1dFQOEDwA7Qc14NUQ/exec'
+    };
+
+    if (urls[kode]) {
+      window.top.location.href = urls[kode];
+    } else {
+      alert('Menu untuk ' + kode + ' belum diatur.');
+    }
+  }
+
+  function logout() {
+    sessionStorage.removeItem('loggedInUser');
+    document.getElementById('menuCard').style.display = 'none';
+    document.getElementById('loginCard').style.display = 'block';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('msg').textContent = '';
+  }
+</script>
+
+</body>
+</html>
